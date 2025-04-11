@@ -6,14 +6,75 @@ const app = express();
 // ✅ Middleware to parse form data
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// ✅ Serve form directly (no need for index.html)
+// ✅ Serve form with CSS styling inside JS
 app.get('/', (req, res) => {
   res.send(`
-    <form action="/submit" method="POST">
-      <label>Name:</label><input name="name" /><br />
-      <label>Email:</label><input name="email" /><br />
-      <button type="submit">Submit</button>
-    </form>
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>CI/CD Form</title>
+      <style>
+        body {
+          background-color: #f4f4f4;
+          font-family: Arial, sans-serif;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 100vh;
+          margin: 0;
+        }
+        form {
+          background: #fff;
+          padding: 25px;
+          border-radius: 10px;
+          box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+          width: 300px;
+        }
+        h2 {
+          text-align: center;
+          margin-bottom: 20px;
+          color: #333;
+        }
+        label {
+          display: block;
+          margin-bottom: 6px;
+          font-weight: bold;
+        }
+        input {
+          width: 100%;
+          padding: 10px;
+          margin-bottom: 15px;
+          border: 1px solid #ccc;
+          border-radius: 5px;
+        }
+        button {
+          width: 100%;
+          padding: 10px;
+          background-color: #28a745;
+          color: white;
+          border: none;
+          border-radius: 5px;
+          font-size: 16px;
+          cursor: pointer;
+        }
+        button:hover {
+          background-color: #218838;
+        }
+      </style>
+    </head>
+    <body>
+      <form action="/submit" method="POST">
+        <h2>User Info Form</h2>
+        <label for="name">Name:</label>
+        <input type="text" name="name" id="name" required />
+
+        <label for="email">Email:</label>
+        <input type="email" name="email" id="email" required />
+
+        <button type="submit">Submit</button>
+      </form>
+    </body>
+    </html>
   `);
 });
 
@@ -38,10 +99,51 @@ const User = mongoose.model('User', userSchema);
 app.post('/submit', async (req, res) => {
   const user = new User(req.body);
   await user.save();
-  res.send(`<h3>Thank you, ${user.name}!</h3><a href="/">Go back</a>`);
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Thank You</title>
+      <style>
+        body {
+          background-color: #e9f7ef;
+          font-family: Arial, sans-serif;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 100vh;
+          margin: 0;
+        }
+        .message-box {
+          background-color: #ffffff;
+          padding: 30px;
+          border-radius: 10px;
+          box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+          text-align: center;
+        }
+        h3 {
+          color: #28a745;
+        }
+        a {
+          display: inline-block;
+          margin-top: 15px;
+          text-decoration: none;
+          color: #007bff;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="message-box">
+        <h3>Thank you, ${user.name}!</h3>
+        <p>Your form has been submitted successfully.</p>
+        <a href="/">← Go back to form</a>
+      </div>
+    </body>
+    </html>
+  `);
 });
 
-// ✅ Show all users
+// ✅ Show all users (JSON view)
 app.get('/users', async (req, res) => {
   const users = await User.find();
   res.json(users);
@@ -51,4 +153,5 @@ app.get('/users', async (req, res) => {
 app.listen(3000, () => {
   console.log('🚀 Server running on http://localhost:3000');
 });
+
 
